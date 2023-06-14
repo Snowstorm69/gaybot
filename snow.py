@@ -28,13 +28,8 @@ async def on_message(message):
         emoji = '<:GOFUCKYOURSELF:1078324546773463060>'
         await message.add_reaction(emoji)
      if message.author.bot: return
-     if "snow" in message.content:
-         await bot.get_user(180124680647213056).send(f"{message.author} said {message.content}")
-     if "Snow" in message.content:
-         await bot.get_user(180124680647213056).send(f"{message.author} said {message.content}")
-     if "Snowy" in message.content:
-         await bot.get_user(180124680647213056).send(f"{message.author} said {message.content}")
-     if "snowy" in message.content:
+     content = message.content.lower()
+     if "snow" in content:
          await bot.get_user(180124680647213056).send(f"{message.author} said {message.content}")
 
      await bot.process_commands(message)
@@ -213,10 +208,12 @@ async def faggot(ctx):
     HidSwag = "https://tenor.com/view/hideri-anime-traps-gif-11098597"
     Suprise = "https://tenor.com/view/blend_s-opening-surprise-anime-trap-gif-10374568"
     Milk = "https://tenor.com/view/classovatrash-wise_wolfy-wise-den-rileydreal1-gif-20220881"
+    WithMen = "https://media.discordapp.net/attachments/721821486599503937/985149863366909974/DEA44F13-882A-4C71-BA49-76214CA1DB35-1-1.gif"
+    AstolfoMaid = "https://media.discordapp.net/attachments/422460091749498881/950915869226188820/You_4.gif"
     SupriseCosplay = "https://tenor.com/view/blend-s-cosplay-its-a-trap-smile-sweet-sister-sadistic-suprise-service-bon-appétit-s-gif-26244710"
     List = [AstolfoCosplay, AstolfoSpin, AstolfoDance, FelixCosplay, FelixGaming, FelixPeace, FelixEars, Hideiri, HidSwag,
             Suprise, SupriseCosplay, Milk, Astolfo, AstolfoThink, AstolfoLounge, A, A2, A3, A4, A5, F, F2, F3, F4,
-            F5, F6]
+            F5, F, WithMen, AstolfoMaid]
     await ctx.send(random.choice(List))
 
 @bot.command()
@@ -231,7 +228,8 @@ async def boykisser(ctx):
     faggot = "https://tenor.com/view/mauzymice-cat-gif-7844744970396116880"
     faggot2 = "https://tenor.com/view/mauzy-mice-gif-15066541285631110359"
     cutemen = "https://tenor.com/view/mauzy-mice-silly-cat-boys-gif-13246211575307806790"
-    List = [SeeMen, Boykisser, Boykisser2, Boykisser3, BoyText, IWouldNever, WhereMenAt, faggot, faggot2, cutemen]
+    bk4 = "https://media.discordapp.net/attachments/945059919906873405/1099424772514926782/attachment-17.gif"
+    List = [SeeMen, Boykisser, Boykisser2, Boykisser3, BoyText, IWouldNever, WhereMenAt, faggot, faggot2, cutemen, bk4]
     await ctx.send(random.choice(List))
 #summons gay shit
 
@@ -268,6 +266,11 @@ async def react(ctx):
         await msg.add_reaction(qoggies)
         await msg.add_reaction(Liliblush)
 #has the bot summon and react to a message "React here for roles!"
+
+# returns with a message that says "<word> me daddy"
+@bot.command()
+async def daddy(ctx, bruh):
+    await ctx.send(f'{bruh} me daddy')
 
 @bot.event
 async def on_raw_reaction_add(reaction):
