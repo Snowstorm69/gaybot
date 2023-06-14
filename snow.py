@@ -8,8 +8,13 @@ from aiohttp import web
 import io
 
 intents = discord.Intents.all()
-TOKEN = "MTExNjUzMTM4ODQ4MTU0MDA5Nw.GDd6j4.UYB1rosSLOfkhT5nmZn0tEv-fJp5uozPtXpL_Y"
+TOKEN = ""
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
+
+async def get_r34(query: str):
+    async with aiohttp.ClientSession() as cs:
+        async with cs.get(f"https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&limit=50&{query}&json=1") as resp:
+            return random.choice(await resp.json())['file_url']
 
 @bot.event
 async def on_message(message):
@@ -54,6 +59,26 @@ async def hello(interaction: discord.Interaction):
 async def say(interaction: discord.Interaction, thing_to_say: str):
     await interaction.response.send_message(thing_to_say)
 #slash command 2
+
+@bot.command()
+async def gayrr(ctx: commands.Context):
+    if not ctx.channel.is_nsfw():
+        return await ctx.send('use in an nsfw channel')
+    num = random.randint(1, 6)
+    if num != 6:
+        return await ctx.send("you got lucky this time...")
+    img = await get_r34("tags=femboy+anal")
+    await ctx.send(img)
+
+@bot.command()
+async def straightrr(ctx: commands.Context):
+    if not ctx.channel.is_nsfw():
+        return await ctx.send('use in an nsfw channel')
+    num = random.randint(1, 6)
+    if num != 6:
+        return await ctx.send("you got lucky this time...")
+    img = await get_r34("tags=straight")
+    await ctx.send(img)
 
 @bot.command()
 async def roll(ctx):
