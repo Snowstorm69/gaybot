@@ -8,13 +8,8 @@ from aiohttp import web
 import io
 
 intents = discord.Intents.all()
-TOKEN = "snowy is fruity"
+TOKEN = "MTExNjUzMTM4ODQ4MTU0MDA5Nw.GDd6j4.UYB1rosSLOfkhT5nmZn0tEv-fJp5uozPtXpL_Y"
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
-
-async def get_r34(query: str):
-    async with aiohttp.ClientSession() as cs:
-        async with cs.get(f"https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&limit=50&{query}&json=1") as resp:
-            return random.choice(await resp.json())['file_url']
 
 @bot.event
 async def on_message(message):
@@ -193,12 +188,27 @@ async def faggot(ctx):
     A3 = "https://64.media.tumblr.com/18f70b0c79246a43e831df59794bac36/tumblr_p9tq092etA1rpzrrmo1_1280.png"
     A4 = "https://preview.redd.it/n49q452gdtm61.png?auto=webp&s=a36a9cc1be815720d3d27392337de5965457fe6c"
     A5 = "https://i.redd.it/i8m0dt26dtr71.jpg"
+    A6 = "https://i.pinimg.com/736x/d6/14/02/d614029a12805d51d2edb3a43729b7ac.jpg"
+    A7 = "https://pm1.aminoapps.com/6526/0d93e36de089401617105aa84959ba1e0bcafc46_hq.jpg"
+    A8 = "https://i.kym-cdn.com/photos/images/original/001/292/040/bbb.jpg"
+    A9 = "https://pm1.aminoapps.com/6610/e5e5e5309e285740acfbeefdea4252c306deb909_hq.jpg"
+    A10 = "https://i.pinimg.com/474x/58/6c/4f/586c4f1ddae82a51383962378cd10039.jpg"
+    A11 = "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/7ea12bea-1e4d-48c0-b35c-8697f0e734e9/deeb9jm-c64aa75b-17df-47ed-9593-5a06d4bf09fb.jpg/v1/fill/w_774,h_1033,q_70,strp/monster_energy_astolfo_by_nekoboxzaza_deeb9jm-pre.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTM2NiIsInBhdGgiOiJcL2ZcLzdlYTEyYmVhLTFlNGQtNDhjMC1iMzVjLTg2OTdmMGU3MzRlOVwvZGVlYjlqbS1jNjRhYTc1Yi0xN2RmLTQ3ZWQtOTU5My01YTA2ZDRiZjA5ZmIuanBnIiwid2lkdGgiOiI8PTEwMjQifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.nNdgSZ9iQFfUUj6FRt-0ythVBojDb4v_y5oNi3c5mGg"
+    A12 = "https://i.kym-cdn.com/photos/images/original/002/019/882/515"
+    A13 = "https://art.ngfiles.com/images/2001000/2001030_sanrioboyfriend_old-astolfo-monster-meme.jpg?f1628309888"
     AstolfoCosplay = "https://tenor.com/view/astolfo-cosplay-emiru-tikrok-rockefeller-street-gif-17205441"
     AstolfoSpin = "https://tenor.com/view/astolfo-gif-22218017"
     AstolfoDance = "https://tenor.com/view/astolfo-fate-dance-gif-22449552"
     Astolfo = "https://i.redd.it/19wv66k6pyg61.png"
     AstolfoLounge = "https://images.alphacoders.com/889/889928.png"
-    AstolfoThink = "https://rare-gallery.com/uploads/posts/1190187-FateApocrypha-FGO-Fate-Series-bicolored-hair-french-braid.jpg"
+    AstolfoThink = "https://media.discordapp.net/attachments/634638016698384395/1118352986779942922/1190187-FateApocrypha-FGO-Fate-Series-bicolored-hair-french-braid.jpg?width=578&height=662"
+    B = "https://preview.redd.it/bridget-looks-sick-heres-a-quick-fanart-v0-ivbo5t023qg91.jpg?width=640&crop=smart&auto=webp&s=06aef7e605befbcbf08eec1729318ec1da5acf6c"
+    B2 = "https://pbs.twimg.com/media/Fc764O6acAETplr?format=jpg&name=4096x4096"
+    B3 = "https://64.media.tumblr.com/5235fa4e629229f83cdd8d979d9ba703/733b5c559430b666-08/s1280x1920/f61fe9e1cd164962f0ae0bd3b50455ef2c10836c.png"
+    B4 = "https://preview.redd.it/lt2mohqa6rg91.jpg?auto=webp&s=7f1b0ac3af6bae02058bb3f5bd95bfccda757dbc"
+    B5 = "https://static.zerochan.net/Bridget.%28GUILTY.GEAR%29.full.2783164.png"
+    C = "https://pbs.twimg.com/media/C-hqYdUXYAAQy2T.jpg"
+    C2 = "https://hentaitrap.com/uploads/posts/cover/medium/217/2175723-46c14.jpg"
     FelixCosplay = "https://tenor.com/view/felix-argyle-trap-funny-cosplay-re-zero-gif-26551204"
     FelixGaming = "https://tenor.com/view/felix-re-zero-felix-argyle-speech-bubble-speech-gif-25397116"
     F = "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/d3456178-ab60-492f-bcdf-00f062f9ade3/dc70iu4-e0e6d33a-49a3-4588-b2bf-fd534bd31d28.jpg/v1/fill/w_636,h_900,q_75,strp/felix_argyle__nsfw_opt__by_axsens_dc70iu4-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9OTAwIiwicGF0aCI6IlwvZlwvZDM0NTYxNzgtYWI2MC00OTJmLWJjZGYtMDBmMDYyZjlhZGUzXC9kYzcwaXU0LWUwZTZkMzNhLTQ5YTMtNDU4OC1iMmJmLWZkNTM0YmQzMWQyOC5qcGciLCJ3aWR0aCI6Ijw9NjM2In1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmltYWdlLm9wZXJhdGlvbnMiXX0.VWlgbez60tPHErHM_U5dsKc3-NJhSPJjg6uadiX9KaQ"
@@ -218,7 +228,7 @@ async def faggot(ctx):
     SupriseCosplay = "https://tenor.com/view/blend-s-cosplay-its-a-trap-smile-sweet-sister-sadistic-suprise-service-bon-appétit-s-gif-26244710"
     List = [AstolfoCosplay, AstolfoSpin, AstolfoDance, FelixCosplay, FelixGaming, FelixPeace, FelixEars, Hideiri, HidSwag,
             Suprise, SupriseCosplay, Milk, Astolfo, AstolfoThink, AstolfoLounge, A, A2, A3, A4, A5, F, F2, F3, F4,
-            F5, F, WithMen, AstolfoMaid]
+            F5, F, WithMen, AstolfoMaid, F6, B, B2, B3, B4, A6, A7, A8, B5, C, A9, A10, C2, A11, A12, A13]
     await ctx.send(random.choice(List))
 
 @bot.command()
@@ -276,27 +286,6 @@ async def react(ctx):
 @bot.command()
 async def daddy(ctx, bruh):
     await ctx.send(f'{bruh} me daddy')
-
-@bot.command()
-async def gayrr(ctx: commands.Context):
-    if not ctx.channel.is_nsfw():
-        return await ctx.send('use in an nsfw channel')
-    num = random.randint(1, 6)
-    if num != 6:
-        return await ctx.send("you got lucky this time...")
-    img = await get_r34("tags=femboy+anal")
-    await ctx.send(img)
-
-@bot.command()
-async def straightrr(ctx: commands.Context):
-    if not ctx.channel.is_nsfw():
-        return await ctx.send('use in an nsfw channel')
-    num = random.randint(1, 6)
-    if num != 6:
-        return await ctx.send("you got lucky this time...")
-    img = await get_r34("tags=straight")
-    await ctx.send(img)
-    
 
 @bot.event
 async def on_raw_reaction_add(reaction):
