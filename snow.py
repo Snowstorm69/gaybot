@@ -312,6 +312,20 @@ async def react(ctx):
 async def daddy(ctx, bruh):
     await ctx.send(f'{bruh} me daddy')
 
+@bot.command()
+async def bkrate(ctx: commands.Context):
+    gay = random.randint(0, 100)
+    msg = "not even a boyliker damn"
+    if gay > 25:
+        msg = "kinda gay ngl"
+    if gay > 50:
+        msg = "damn pretty fuckin gay"
+    if gay > 75:
+        msg = "holy shit you're a fag"
+
+    embed = discord.Embed(title=f"Boykisser Rating: {gay}% :rainbow_flag:", description=msg, color=discord.Color.pink())
+    await ctx.send(embed=embed)
+
 @bot.event
 async def on_raw_reaction_add(reaction):
     guild = bot.get_guild(762470802687787051)
