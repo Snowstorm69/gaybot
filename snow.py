@@ -10,8 +10,9 @@ from aiohttp import web
 import io
 
 intents = discord.Intents.all()
-TOKEN = "boykissing"
+TOKEN = ""
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
+bot.db: aiosqlite.Connection
 
 async def get_r34(query: str):
     async with aiohttp.ClientSession() as cs:
@@ -60,10 +61,14 @@ async def on_message(message):
                 await cursor.execute("UPDATE levels SET xp = ? WHERE user = ? AND guild = ?", (xp, author.id, guild.id,))
         if xp >= 100:
             level = level + 1
-            await cursor.execute("SELECT role FROM levelSettings WHERE levelReq = ? AND guild = ?", (level,guild.id))
+            await cursor.execute("SELECT role FROM roles WHERE guild = ? AND level = ?", (message.guild.id, level))
             role = await cursor.fetchone()
             await cursor.execute("UPDATE levels SET level = ? WHERE user = ? AND guild = ?", (level, author.id, guild.id,))
             await cursor.execute("UPDATE levels SET xp = ? WHERE user = ? AND guild = ?", (0, author.id, guild.id,))
+            if role:
+                role = message.guild.get_role(role[0])
+                await message.author.add_roles(role)
+                await message.channel.send(f"{message.author} has received the {role.name} role")
             #if role:
                 #role = role[0]
                 #role = guild.get_role(role)
@@ -143,6 +148,7 @@ async def on_ready():
     async with bot.db.cursor() as cursor:
         await cursor.execute("CREATE TABLE IF NOT EXISTS levels(level INTEGER, xp INTEGER, user INTEGER, guild INTEGER)")
         await cursor.execute("CREATE TABLE IF NOT EXISTS levelsettings(levelsys BOOL, role INTEGER, levelreq INTEGER, guild INTEGER)")
+        await cursor.execute("CREATE TABLE IF NOT EXISTS roles(role INTEGER, guild INTEGER, level INTEGER)")
         await bot.db.commit()
     try:
         synced = await bot.tree.sync()
@@ -160,6 +166,13 @@ async def hello(interaction: discord.Interaction):
 async def say(interaction: discord.Interaction, thing_to_say: str):
     await interaction.response.send_message(thing_to_say)
 #slash command 2
+
+@bot.command()
+async def addrole(ctx: commands.Context, role: discord.Role, level: int):
+    async with bot.db.cursor() as cursor:
+        await cursor.execute("INSERT INTO roles (role, guild, level) VALUES (?, ?, ?)", (role.id, ctx.guild.id, level))
+    await bot.db.commit()
+    await ctx.send("done")
 
 @bot.command()
 async def gayrr(ctx: commands.Context):
