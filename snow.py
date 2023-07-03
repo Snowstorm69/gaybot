@@ -87,6 +87,22 @@ async def on_message(message):
      await bot.process_commands(message)
     #easy call and response code, + level system(broke)
 
+@bot.command(aliases=['lb'])
+async def leaderboard(ctx: commands.Context):
+    async with bot.db.cursor() as cursor:
+        await cursor.execute("SELECT * FROM levels WHERE guild = ? ORDER BY level DESC", (ctx.guild.id,))
+        data = await cursor.fetchall()
+        data_str = ""
+        c = 0
+        for i in data:
+            data_str += f"{c + 1}. **{ctx.guild.get_member(i[2])}** - Level {i[0]} | {i[1]} XP\n"
+            if c == 10:
+                break
+            c += 1
+
+        embed = discord.Embed(title=f"Leaderboard for {ctx.guild.name}", description=data_str)
+        await ctx.send(embed=embed)
+
 @bot.command(aliases=['lvl', 'rank', 'r'])
 async def level(ctx, member: discord.Member = None):
     if member is None:
