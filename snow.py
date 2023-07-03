@@ -3,12 +3,14 @@ import random
 from discord.ext import commands
 from discord import app_commands
 import aiohttp
+import aiosqlite
+from easy_pil import *
 import asyncio
 from aiohttp import web
 import io
 
 intents = discord.Intents.all()
-TOKEN = ""
+TOKEN = "boykissing"
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
 
 async def get_r34(query: str):
@@ -32,23 +34,122 @@ async def on_message(message):
      if message.content.startswith("GFY"):
         emoji = '<:GOFUCKYOURSELF:1078324546773463060>'
         await message.add_reaction(emoji)
+     author = message.author
+     guild = message.guild
+     async with bot.db.cursor() as cursor:
+        await cursor.execute("SELECT xp FROM levels WHERE user = ? AND guild = ?", (author.id, guild.id,))
+        xp = await cursor.fetchone()
+        await cursor.execute("SELECT level FROM levels WHERE user = ? AND guild = ?", (author.id, guild.id,))
+        level = await cursor.fetchone()
+        if not xp or not level:
+            await cursor.execute("INSERT INTO levels (level, xp, user, guild) VALUES (?, ?, ?, ?)", (0, 0, author.id, guild.id,))
+            await bot.db.commit()
+        try:
+            xp = xp[0]
+            level = level[0]
+        except TypeError:
+            xp = 0
+            level = 0
+        if level < 5:
+            xp += random.randint(1, 5)
+            await cursor.execute("UPDATE levels SET xp = ? WHERE user = ? AND guild = ?", (xp, author.id, guild.id,))
+        else:
+            rand = random.randint(1,(level//4))
+            if rand == 1:
+                xp += random.randint(1, 5)
+                await cursor.execute("UPDATE levels SET xp = ? WHERE user = ? AND guild = ?", (xp, author.id, guild.id,))
+        if xp >= 100:
+            level = level + 1
+            await cursor.execute("SELECT role FROM levelSettings WHERE levelReq = ? AND guild = ?", (level,guild.id))
+            role = await cursor.fetchone()
+            await cursor.execute("UPDATE levels SET level = ? WHERE user = ? AND guild = ?", (level, author.id, guild.id,))
+            await cursor.execute("UPDATE levels SET xp = ? WHERE user = ? AND guild = ?", (0, author.id, guild.id,))
+            #if role:
+                #role = role[0]
+                #role = guild.get_role(role)
+                #try:
+                    #await author.add_roles(role)
+                    #await message.channel.send(f"{author.mention} has gayed to level **level** {level} and earned {role.name}")
+                #except discord.HTTPException:
+                    #await message.channel.send(f"{author.mention} has gayed to faggot level {level} (cant get gayer)")
+            await message.channel.send(f"{author.mention} has gayed to faggot level {level}")
+     await bot.db.commit()
      if message.author.bot: return
      content = message.content.lower()
-     if "snow" in content:
-         await bot.get_user(180124680647213056).send(f"{message.author} said {message.content}")
+     #if "snow" in content:
+         #await bot.get_user(180124680647213056).send(f"{message.author} said {message.content}")
 
      await bot.process_commands(message)
-    #easy call and response code
+    #easy call and response code, + level system(broke)
+
+@bot.command(aliases=['lvl', 'rank', 'r'])
+async def level(ctx, member: discord.Member = None):
+    if member is None:
+        member = ctx.author
+    async with bot.db.cursor() as cursor:
+        await cursor.execute("SELECT xp FROM levels WHERE user = ? AND guild = ?", (member.id, ctx.guild.id), )
+        xp = await cursor.fetchone()
+        await cursor.execute("SELECT level FROM levels WHERE user = ? AND guild = ?", (member.id, ctx.guild.id), )
+        level = await cursor.fetchone()
+        if not xp or not level:
+            await cursor.execute("INSERT INTO levels (level, xp, user, guild) VALUES (?, ?, ?, ?)", (0, 0, member.id, ctx.guild.id,))
+            await bot.db.commit()
+        try:
+            xp = xp[0]
+            level = level[0]
+        except TypeError:
+            xp = 0
+            level = 0
+        user_data = {
+        "name": f"{member.name}#{member.discriminator}",
+        "xp": xp,
+        "level": level,
+        "next_level_xp": 100,
+        "percentage": xp,}
+
+        background = Editor(Canvas((900, 300), color ="#07e6f7"))
+        profile_picture = await load_image_async(str(member.avatar.url))
+        profile = Editor(profile_picture).resize((150, 150)).circle_image()
+        poppins = Font.poppins(size=40)
+        poppins_small = Font.poppins(size=30)
+
+        card_right_shape = [(600, 0), (750, 300), (900, 300), (900, 0)]
+
+        background.polygon(card_right_shape, color="#070606")
+        background.paste(profile, (30, 30))
+
+        background.rectangle((30, 220), width = 650, height = 40, color ="#ffffff")
+        background.bar((30,220), max_width= 650, height = 40, percentage=user_data["percentage"], color="#e60d0d", radius = 20,)
+        background.text((200,40), user_data["name"], font=poppins, color ="#ffffff")
+
+        background.rectangle((200,100), width = 350, height= 2, fill ="#ffffff")
+        background.text(
+            (200,130),
+            f"Level - {user_data['level']} | XP - {user_data['xp']}/{user_data['next_level_xp']}",
+            font = poppins_small,
+            color = "#ffffff",)
+
+        file = discord.File(fp=background.image_bytes, filename="levelcard.png")
+        await ctx.send(file=file)
+
+@bot.command()
+async def rewards(ctx):
+    async with bot.db.cursor() as cursor:
+        await cursor.execute("SELECT levelsys FROM")
 
 @bot.event
 async def on_ready():
+    setattr(bot, "db", await aiosqlite.connect('level.db'))
+    async with bot.db.cursor() as cursor:
+        await cursor.execute("CREATE TABLE IF NOT EXISTS levels(level INTEGER, xp INTEGER, user INTEGER, guild INTEGER)")
+        await cursor.execute("CREATE TABLE IF NOT EXISTS levelsettings(levelsys BOOL, role INTEGER, levelreq INTEGER, guild INTEGER)")
+        await bot.db.commit()
     try:
         synced = await bot.tree.sync()
         print(f"Synced{len(synced)} command(s)")
     except Exception as e:
         print(e)
     #message for when bot boots up to confirm its working
-
 @bot.tree.command(name="shut")
 async def hello(interaction: discord.Interaction):
     await interaction.response.send_message(f"shut up {interaction.user.mention}")
@@ -81,20 +182,22 @@ async def straightrr(ctx: commands.Context):
     await ctx.send(img)
 
 @bot.command()
+async def rule34(ctx: commands.Context):
+    if not ctx.channel.is_nsfw():
+        return await ctx.send('use in an nsfw channel')
+    img = await get_r34("tags=straight")
+    await ctx.send(img)
+
+@bot.command()
+async def rule34gay(ctx: commands.Context):
+    if not ctx.channel.is_nsfw():
+        return await ctx.send('use in an nsfw channel')
+    img = await get_r34("tags=femboy+anal")
+    await ctx.send(img)
+
+@bot.command()
 async def roll(ctx):
     await ctx.send(random.randint(1,69))
-
-@bot.command()
-async def ping(ctx):
-    await ctx.send('Pong!')
-
-@bot.command()
-async def erika(ctx):
-    await ctx.send('Erika fucking sucks!')
-
-@bot.command()
-async def sabby(ctx):
-    await ctx.send('CHEESEBURGER SUPREMACY')
 
 @bot.command()
 async def blossom(ctx):
@@ -102,16 +205,12 @@ async def blossom(ctx):
 #replies with a string that is defined in the send
 
 @bot.command()
-async def taco(ctx):
-    await ctx.send('TacoBruh is really dumb!')
-
-@bot.command()
-async def cowgif(ctx):
-    await ctx.send("http://imgur.com/gallery/YiMUiop")
-
-@bot.command()
 async def lesbeon(ctx):
     await ctx.send("https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/2d5710c1-6133-426b-ac1d-463ea3a3d2a7/dfthotw-3dcaeac3-2061-44d7-a98f-329a2c02c186.png/v1/fill/w_986,h_810,q_70,strp/lesbian_espeon_by_rhe_ima_dfthotw-pre.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTA1MiIsInBhdGgiOiJcL2ZcLzJkNTcxMGMxLTYxMzMtNDI2Yi1hYzFkLTQ2M2VhM2EzZDJhN1wvZGZ0aG90dy0zZGNhZWFjMy0yMDYxLTQ0ZDctYTk4Zi0zMjlhMmMwMmMxODYucG5nIiwid2lkdGgiOiI8PTEyODAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.SWRvYHOEDR3xEEmCP-ONMS0nQ5lESUHtnf7lSgva6tk")
+
+@bot.command()
+async def dip(ctx):
+    await ctx.send("https://tenor.com/view/nileseyy-niles-peace-out-disappear-meme-disappearing-guy-checking-out-gif-25558985")
 
 @bot.command()
 async def astolfo(ctx):
@@ -120,11 +219,6 @@ async def astolfo(ctx):
 @bot.command()
 async def astolfobounce(ctx):
     await ctx.send("https://tenor.com/view/astolfo-gif-21758557")
-
-@bot.command()
-async def borgor(ctx):
-    await ctx.send("https://s23209.pcdn.co/wp-content/uploads/2022/07/220602_DD_The-Best-Ever-Cheeseburger_267-1024x1536.jpg")
-#sends image linked in the send
 
 @bot.command()
 async def KYS(ctx):
@@ -180,8 +274,8 @@ async def ban(ctx, user:discord.Member):
 @bot.command()
 async def purge(ctx, Number):
     member = ctx.author
-    guild = bot.get_guild(1117192931258925097)
-    Admin = guild.get_role(1117193766449729636)
+    guild = bot.get_guild(762470802687787051)
+    Admin = guild.get_role(762471280627810324)
     if Admin in member.roles:
         await ctx.channel.purge(limit=int(Number), oldest_first=False, bulk=True, reason=None)
     else:
@@ -292,19 +386,17 @@ async def dog(ctx):
 
 @bot.command()
 async def react(ctx):
-    msg=await ctx.send("React here for roles! wolfgasm: Elder Student. Swag: Swag Gang. Qoggies: Dumbass. Liliblush: NSFW.")
+    msg=await ctx.send("React here for roles! wolfgasm: Elder Student. Swag: Swag Gang. Qoggies: Dumbass.")
     global msg_id
     msg_id = msg.id
 
     wolfgasm = '<:wolfgasm:817931164202827788>'
-    swag = '<:Swag:812663160917721118>'
-    qoggies = '<:Qoggies:762484869854003231>'
-    Liliblush = '<:LiliBlush:767942752657866763>'
-    if msg.content == "React here for roles! wolfgasm: Elder Student. Swag: Swag Gang. Qoggies: Dumbass. Liliblush: NSFW.":
+    swag = '<:Swag:1120807757063397396>'
+    qoggies = '<:Qoggies:1120807941558251580>'
+    if msg.content == "React here for roles! wolfgasm: Elder Student. Swag: Swag Gang. Qoggies: Dumbass.":
         await msg.add_reaction(wolfgasm)
         await msg.add_reaction(swag)
         await msg.add_reaction(qoggies)
-        await msg.add_reaction(Liliblush)
 #has the bot summon and react to a message "React here for roles!"
 
 # returns with a message that says "<word> me daddy"
@@ -323,7 +415,21 @@ async def bkrate(ctx: commands.Context):
     if gay > 75:
         msg = "holy shit you're a fag"
 
-    embed = discord.Embed(title=f"Boykisser Rating: {gay}% :rainbow_flag:", description=msg, color=discord.Color.pink())
+    embed = discord.Embed(title=f"Boykisser Rating: {gay}% :rainbow_flag:", description=msg)
+    await ctx.send(embed=embed)
+
+@bot.command()
+async def gkrate(ctx: commands.Context):
+    gay = random.randint(0, 100)
+    msg = "bro doesnt like women"
+    if gay > 25:
+        msg = "mid tier rizz"
+    if gay > 50:
+        msg = "holy shit they get play"
+    if gay > 75:
+        msg = "bros making out with a girl right now"
+
+    embed = discord.Embed(title=f"Girlkisser Rating: {gay}% :rainbow_flag:", description=msg)
     await ctx.send(embed=embed)
 
 @bot.event
@@ -333,15 +439,11 @@ async def on_raw_reaction_add(reaction):
     Student = guild.get_role(776634196684439572) #equipped with wolfgasm
     Dumbass = guild.get_role(960678410349314048) #equipped with qoggies
     SwagGang = guild.get_role(818768572779462688) #equipped with swag
-    NSFW = guild.get_role(818050950874791936) #equipped with Liliblush
     if msg_id == reaction.message_id:
-        if reaction.emoji.name == 'LiliBlush':
-            await User.add_roles(NSFW)
         if reaction.emoji.name == 'Qoggies':
             await User.add_roles(Dumbass)
         if reaction.emoji.name == 'wolfgasm':
             await User.add_roles(Student)
         if reaction.emoji.name == 'Swag':
             await User.add_roles(SwagGang)
-
 bot.run(TOKEN)
