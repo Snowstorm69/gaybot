@@ -90,13 +90,13 @@ async def on_message(message):
 @bot.command(aliases=['lb'])
 async def leaderboard(ctx: commands.Context):
     async with bot.db.cursor() as cursor:
-        await cursor.execute("SELECT * FROM levels WHERE guild = ? ORDER BY level DESC", (ctx.guild.id,))
+        await cursor.execute("SELECT * FROM levels WHERE guild = ? ORDER BY level DESC, xp DESC", (ctx.guild.id,))
         data = await cursor.fetchall()
         data_str = ""
         c = 0
         for i in data:
             data_str += f"{c + 1}. **{ctx.guild.get_member(i[2])}** - Level {i[0]} | {i[1]} XP\n"
-            if c == 10:
+            if c == 9:
                 break
             c += 1
 
